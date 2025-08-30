@@ -101,6 +101,19 @@ async function main() {
         status: 'ACTIVE',
       },
     }),
+    prisma.car.upsert({
+      where: { licensePlate: 'TESLA999' },
+      update: {},
+      create: {
+        make: 'Tesla',
+        model: 'Model 3',
+        year: 2024,
+        licensePlate: 'KL-07-TS-9999',
+        vin: '1234567890ABCDEF5',
+        color: 'Red',
+        status: 'ACTIVE',
+      },
+    }),
   ])
 
   console.log('✅ Created cars')

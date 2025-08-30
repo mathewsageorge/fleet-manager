@@ -74,13 +74,19 @@ CLOUDINARY_API_SECRET="your-cloudinary-secret"
 
 ## Features
 
-- ✅ Incident Creation and Management
-- ✅ Real-time Status Updates
-- ✅ Image Upload Support
-- ✅ Advanced Filtering and Search
-- ✅ Analytics Dashboard
-- ✅ Responsive Mobile Design
-- ✅ Assignment Workflow
+### ✅ Must Have Features
+- ✅ **Create, read, update incident records** - Full CRUD operations with validation
+- ✅ **Image upload and management** - Cloudinary integration with preview and gallery
+- ✅ **Status workflow management** - Complete status tracking with notifications
+- ✅ **Basic search and filtering** - Advanced search with multiple filter combinations
+- ✅ **Responsive UI design** - Mobile-first responsive design
+
+### ✅ Should Have Features
+- ✅ **Advanced analytics dashboard** - Comprehensive metrics and visualizations
+- ✅ **Incident assignment system** - Manager assignment workflow
+- ✅ **Comment/update system** - Real-time comment tracking with audit trail
+- ✅ **Export functionality** - CSV export with filtered data
+- ✅ **Real-time notifications** - Browser notifications and in-app notification system
 
 ## Development
 
@@ -91,11 +97,16 @@ CLOUDINARY_API_SECRET="your-cloudinary-secret"
 
 ## API Endpoints
 
-- `GET /api/incidents` - List incidents
+- `GET /api/incidents` - List incidents with filtering
 - `POST /api/incidents` - Create incident
 - `GET /api/incidents/[id]` - Get incident details
 - `PUT /api/incidents/[id]` - Update incident
 - `POST /api/incidents/[id]/updates` - Add comment/update
+- `GET /api/incidents/stats` - Get analytics data
+- `GET /api/incidents/export` - Export incidents to CSV
+- `POST /api/upload` - Upload images
+- `GET /api/cars` - List vehicles
+- `GET /api/users` - List users
 
 ## Deployment
 

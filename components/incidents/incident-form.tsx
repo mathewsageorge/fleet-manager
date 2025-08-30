@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCreateIncident, useCars, useUsers } from '@/lib/queries/incidents'
+import { notifications } from '@/lib/notifications'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -78,7 +79,15 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
         images: formData.images,
       }
 
-      await createMutation.mutateAsync(submitData)
+      const newIncident = await createMutation.mutateAsync(submitData)
+      
+      // Send notification based on severity
+      if (submitData.severity === 'CRITICAL') {
+        notifications.criticalIncident(newIncident)
+      } else {
+        notifications.newIncident(newIncident)
+      }
+      
       router.push('/fleetmanager/incidents')
     } catch (error) {
       console.error('Failed to create incident:', error)

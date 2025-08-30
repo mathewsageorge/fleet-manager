@@ -23,7 +23,22 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+    
+    /* Enhanced color palette */
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 210 40% 98%;
+    --warning: 32.5 94.6% 43.7%;
+    --warning-foreground: 210 40% 98%;
+    --info: 213.1 93.9% 67.8%;
+    --info-foreground: 210 40% 98%;
+    
+    /* Animation variables */
+    --animation-fast: 150ms;
+    --animation-normal: 250ms;
+    --animation-slow: 350ms;
+    --animation-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --animation-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
@@ -46,6 +61,13 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
+    
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 210 40% 98%;
+    --warning: 32.5 94.6% 43.7%;
+    --warning-foreground: 210 40% 98%;
+    --info: 213.1 93.9% 67.8%;
+    --info-foreground: 210 40% 98%;
   }
 }
 
@@ -53,7 +75,226 @@
   * {
     @apply border-border;
   }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Enhanced focus styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2;
+  }
+  
+  /* Custom scrollbar for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/30;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer components {
+  /* Glass morphism effect */
+  .glass {
+    backdrop-filter: blur(16px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(209, 213, 219, 0.3);
+  }
+  
+  .glass-dark {
+    backdrop-filter: blur(16px) saturate(180%);
+    background-color: rgba(17, 25, 39, 0.75);
+    border: 1px solid rgba(75, 85, 99, 0.3);
+  }
+  
+  /* Enhanced animations */
+  .animate-fade-in {
+    animation: fadeIn var(--animation-normal) var(--animation-smooth) forwards;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp var(--animation-normal) var(--animation-smooth) forwards;
+  }
+  
+  .animate-slide-down {
+    animation: slideDown var(--animation-normal) var(--animation-smooth) forwards;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn var(--animation-normal) var(--animation-bounce) forwards;
+  }
+  
+  .animate-bounce-subtle {
+    animation: bounceSubtle var(--animation-slow) var(--animation-bounce) forwards;
+  }
+  
+  /* Loading shimmer effect */
+  .animate-shimmer {
+    background: linear-gradient(110deg, #f1f5f9 8%, #e2e8f0 18%, #f1f5f9 33%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+  }
+  
+  /* Enhanced shadows */
+  .shadow-soft {
+    box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  }
+  
+  .shadow-colored {
+    box-shadow: 0 4px 14px 0 rgba(0, 118, 255, 0.15);
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 0 40px rgba(59, 130, 246, 0.06);
+  }
+  
+  /* Interactive states */
+  .interactive {
+    @apply transition-all duration-200 ease-out;
+    @apply hover:scale-[1.02] hover:shadow-lg;
+    @apply active:scale-[0.98];
+  }
+  
+  .interactive-soft {
+    @apply transition-all duration-200 ease-out;
+    @apply hover:shadow-md hover:-translate-y-0.5;
+    @apply active:translate-y-0;
+  }
+}
+
+@layer utilities {
+  /* Custom animations keyframes */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes bounceSubtle {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  
+  /* Responsive text utilities */
+  .text-responsive-xs {
+    @apply text-xs sm:text-sm;
+  }
+  
+  .text-responsive-sm {
+    @apply text-sm sm:text-base;
+  }
+  
+  .text-responsive-base {
+    @apply text-base sm:text-lg;
+  }
+  
+  .text-responsive-lg {
+    @apply text-lg sm:text-xl;
+  }
+  
+  .text-responsive-xl {
+    @apply text-xl sm:text-2xl;
+  }
+  
+  .text-responsive-2xl {
+    @apply text-2xl sm:text-3xl;
+  }
+  
+  .text-responsive-3xl {
+    @apply text-3xl sm:text-4xl;
+  }
+  
+  /* Spacing utilities for mobile-first design */
+  .space-mobile {
+    @apply space-y-4 sm:space-y-6;
+  }
+  
+  .gap-mobile {
+    @apply gap-4 sm:gap-6;
+  }
+  
+  .p-mobile {
+    @apply p-4 sm:p-6;
+  }
+  
+  .px-mobile {
+    @apply px-4 sm:px-6;
+  }
+  
+  .py-mobile {
+    @apply py-4 sm:py-6;
   }
 }

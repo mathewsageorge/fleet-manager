@@ -1,14 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { useIncidents, useUpdateIncident } from '@/lib/queries/incidents'
+import { useIncidents, useUpdateIncident, useExportIncidents } from '@/lib/queries/incidents'
+import { notifications } from '@/lib/notifications'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { formatDateTime, getSeverityColor, getStatusColor } from '@/lib/utils'
-import { Search, Filter, Eye, Edit } from 'lucide-react'
+import { Search, Filter, Eye, Edit, Download } from 'lucide-react'
 import Link from 'next/link'
 
 interface IncidentsTableProps {
@@ -23,9 +24,17 @@ export function IncidentsTable({ showFilters = true }: IncidentsTableProps) {
     page: 1,
     limit: 10,
   })
+  const [updatingIncidents, setUpdatingIncidents] = useState<Set<string>>(new Set())
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   const { data, isLoading } = useIncidents(filters)
   const updateMutation = useUpdateIncident()
+  const exportMutation = useExportIncidents()
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 3000) // Hide after 3 seconds
+  }
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value, page: 1 }))
@@ -33,12 +42,47 @@ export function IncidentsTable({ showFilters = true }: IncidentsTableProps) {
 
   const handleStatusChange = async (incidentId: string, newStatus: string) => {
     try {
+      // Add incident to updating set
+      setUpdatingIncidents(prev => new Set(prev).add(incidentId))
+      
+      const incident = incidents.find((i: any) => i.id.toString() === incidentId)
+      const oldStatus = incident?.status
+      
       await updateMutation.mutateAsync({
         id: incidentId,
         data: { status: newStatus as any }
       })
+
+      // Send notification for status change
+      if (incident && oldStatus !== newStatus) {
+        notifications.statusChanged(incident, oldStatus, newStatus)
+        
+        // Send resolved notification
+        if (newStatus === 'RESOLVED') {
+          notifications.incidentResolved(incident)
+        }
+        
+        // Show success feedback
+        showToast(`Status updated to ${newStatus.replace('_', ' ').toLowerCase()}`, 'success')
+      }
     } catch (error) {
       console.error('Failed to update status:', error)
+      showToast('Failed to update status. Please try again.', 'error')
+    } finally {
+      // Remove incident from updating set
+      setUpdatingIncidents(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(incidentId)
+        return newSet
+      })
+    }
+  }
+
+  const handleExport = async () => {
+    try {
+      await exportMutation.mutateAsync(filters)
+    } catch (error) {
+      console.error('Failed to export incidents:', error)
     }
   }
 
@@ -103,6 +147,15 @@ export function IncidentsTable({ showFilters = true }: IncidentsTableProps) {
               >
                 Clear Filters
               </Button>
+              <Button
+                variant="outline"
+                onClick={handleExport}
+                disabled={exportMutation.isPending}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {exportMutation.isPending ? 'Exporting...' : 'Export CSV'}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -144,17 +197,25 @@ export function IncidentsTable({ showFilters = true }: IncidentsTableProps) {
                         </div>
                       </td>
                       <td className="p-4">
-                        <Select
-                          value={incident.status}
-                          onChange={(e) => handleStatusChange(incident.id.toString(), e.target.value)}
-                          className="w-32"
-                        >
-                          <option value="PENDING">Pending</option>
-                          <option value="IN_PROGRESS">In Progress</option>
-                          <option value="RESOLVED">Resolved</option>
-                          <option value="CLOSED">Closed</option>
-                          <option value="CANCELLED">Cancelled</option>
-                        </Select>
+                        <div className="relative">
+                          <Select
+                            value={incident.status}
+                            onChange={(e) => handleStatusChange(incident.id.toString(), e.target.value)}
+                            className="w-32"
+                            disabled={updatingIncidents.has(incident.id.toString())}
+                          >
+                            <option value="PENDING">Pending</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="RESOLVED">Resolved</option>
+                            <option value="CLOSED">Closed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                          </Select>
+                          {updatingIncidents.has(incident.id.toString()) && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded">
+                              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="p-4">
                         <Badge className={getSeverityColor(incident.severity)}>
@@ -213,6 +274,31 @@ export function IncidentsTable({ showFilters = true }: IncidentsTableProps) {
             </CardHeader>
             <CardContent className="pt-0">
               <p className="text-sm mb-3">{incident.description}</p>
+              
+              {/* Mobile Status Selector */}
+              <div className="mb-3">
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Status</label>
+                <div className="relative">
+                  <Select
+                    value={incident.status}
+                    onChange={(e) => handleStatusChange(incident.id.toString(), e.target.value)}
+                    className="w-full"
+                    disabled={updatingIncidents.has(incident.id.toString())}
+                  >
+                    <option value="PENDING">Pending</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="RESOLVED">Resolved</option>
+                    <option value="CLOSED">Closed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </Select>
+                  {updatingIncidents.has(incident.id.toString()) && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded">
+                      <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              
               <div className="flex items-center justify-between">
                 <div className="text-xs text-muted-foreground">
                   {formatDateTime(incident.reportedAt)} by {incident.reportedBy?.name}
@@ -260,6 +346,28 @@ export function IncidentsTable({ showFilters = true }: IncidentsTableProps) {
             >
               Next
             </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+          toast.type === 'success' 
+            ? 'bg-green-500 text-white' 
+            : 'bg-red-500 text-white'
+        }`}>
+          <div className="flex items-center gap-2">
+            {toast.type === 'success' ? (
+              <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center">
+                ✓
+              </div>
+            ) : (
+              <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center">
+                ✕
+              </div>
+            )}
+            <span className="text-sm font-medium">{toast.message}</span>
           </div>
         </div>
       )}

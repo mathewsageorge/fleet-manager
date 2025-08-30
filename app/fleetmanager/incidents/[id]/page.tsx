@@ -1,6 +1,7 @@
 'use client'
 
 import { useIncidentDetail, useAddIncidentComment } from '@/lib/queries/incidents'
+import { notifications } from '@/lib/notifications'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,11 +22,16 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
     if (!comment.trim()) return
     
     try {
-      await addCommentMutation.mutateAsync({
+      const newComment = await addCommentMutation.mutateAsync({
         id: resolvedParams.id,
         comment: comment.trim()
       })
       setComment('')
+      
+      // Send notification for new comment
+      if (incident) {
+        notifications.newComment(incident, newComment)
+      }
     } catch (error) {
       console.error('Failed to add comment:', error)
     }
