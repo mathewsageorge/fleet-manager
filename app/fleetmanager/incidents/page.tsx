@@ -1,3 +1,4 @@
+
 import { IncidentsTable } from '@/components/incidents/incidents-table'
 import { AlertTriangle } from 'lucide-react'
 

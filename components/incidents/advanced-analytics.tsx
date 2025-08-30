@@ -9,7 +9,6 @@ import {
   CheckCircle, 
   TrendingUp, 
   TrendingDown,
-  DollarSign,
   Shield,
   Activity
 } from 'lucide-react'
@@ -61,11 +60,6 @@ export function AdvancedAnalytics() {
   if (!stats) return null
 
   // Calculate additional metrics
-  const totalCost = (stats.bySeverity.CRITICAL || 0) * 5000 + 
-                   (stats.bySeverity.HIGH || 0) * 2000 + 
-                   (stats.bySeverity.MEDIUM || 0) * 800 + 
-                   (stats.bySeverity.LOW || 0) * 200
-
   const resolutionRate = stats.total > 0 
     ? Math.round(((stats.byStatus.RESOLVED || 0) + (stats.byStatus.CLOSED || 0)) / stats.total * 100)
     : 0
@@ -107,15 +101,6 @@ export function AdvancedAnalytics() {
       iconBg: 'bg-green-100 text-green-600',
     },
     {
-      title: 'Estimated Total Cost',
-      value: `$${totalCost.toLocaleString()}`,
-      description: 'Based on severity levels',
-      icon: DollarSign,
-      trend: generateTrend(),
-      color: 'from-emerald-500 to-teal-600',
-      iconBg: 'bg-emerald-100 text-emerald-600',
-    },
-    {
       title: 'Critical Issues',
       value: stats.bySeverity.CRITICAL || 0,
       description: 'High priority incidents',
@@ -129,7 +114,7 @@ export function AdvancedAnalytics() {
   return (
     <div className="space-y-8">
       {/* Essential Metrics */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         {essentialMetrics.map((metric) => (
           <Card key={metric.title} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg hover:scale-[1.02] overflow-hidden relative">
             <div className={`h-1 bg-gradient-to-r ${metric.color}`} />

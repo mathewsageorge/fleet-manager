@@ -6,7 +6,9 @@ class ApiClient {
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}/api${endpoint}`
+    const url = endpoint.startsWith('/api') 
+      ? `${this.baseUrl}${endpoint}`
+      : `${this.baseUrl}/api${endpoint}`
     
     const config: RequestInit = {
       headers: {

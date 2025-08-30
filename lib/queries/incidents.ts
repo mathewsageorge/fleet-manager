@@ -52,7 +52,7 @@ export interface UpdateIncidentData {
 export const fetchIncidents = async (filters: IncidentFilters = {}) => {
   const params = new URLSearchParams()
   Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
+    if (value !== undefined && value !== null && value !== '' && value !== 'ALL') {
       params.append(key, String(value))
     }
   })

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { formatDateTime, getSeverityColor, getStatusColor } from '@/lib/utils'
 import { Search, Filter, Eye, Edit, Download } from 'lucide-react'
 import Link from 'next/link'
@@ -19,8 +19,8 @@ interface IncidentsTableProps {
 export function IncidentsTable({ showFilters = true }: IncidentsTableProps) {
   const [filters, setFilters] = useState({
     query: '',
-    status: '',
-    severity: '',
+    status: 'ALL',
+    severity: 'ALL',
     page: 1,
     limit: 10,
   })
@@ -120,31 +120,35 @@ export function IncidentsTable({ showFilters = true }: IncidentsTableProps) {
                   className="pl-9"
                 />
               </div>
-              <Select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-              >
-                <option value="">All Statuses</option>
-                <option value="PENDING">Pending</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="RESOLVED">Resolved</option>
-                <option value="CLOSED">Closed</option>
-                <option value="CANCELLED">Cancelled</option>
-              </Select>
-              <Select
-                value={filters.severity}
-                onChange={(e) => handleFilterChange('severity', e.target.value)}
-              >
-                <option value="">All Severities</option>
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
-                <option value="CRITICAL">Critical</option>
-              </Select>
-              <Button
-                variant="outline"
-                onClick={() => setFilters({ query: '', status: '', severity: '', page: 1, limit: 10 })}
-              >
+                             <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
+                 <SelectTrigger>
+                   <SelectValue placeholder="All Statuses" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="ALL">All Statuses</SelectItem>
+                   <SelectItem value="PENDING">Pending</SelectItem>
+                   <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                   <SelectItem value="RESOLVED">Resolved</SelectItem>
+                   <SelectItem value="CLOSED">Closed</SelectItem>
+                   <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                 </SelectContent>
+               </Select>
+                             <Select value={filters.severity} onValueChange={(value) => handleFilterChange('severity', value)}>
+                 <SelectTrigger>
+                   <SelectValue placeholder="All Severities" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="ALL">All Severities</SelectItem>
+                   <SelectItem value="LOW">Low</SelectItem>
+                   <SelectItem value="MEDIUM">Medium</SelectItem>
+                   <SelectItem value="HIGH">High</SelectItem>
+                   <SelectItem value="CRITICAL">Critical</SelectItem>
+                 </SelectContent>
+               </Select>
+                             <Button
+                 variant="outline"
+                 onClick={() => setFilters({ query: '', status: 'ALL', severity: 'ALL', page: 1, limit: 10 })}
+               >
                 Clear Filters
               </Button>
               <Button
@@ -198,17 +202,21 @@ export function IncidentsTable({ showFilters = true }: IncidentsTableProps) {
                       </td>
                       <td className="p-4">
                         <div className="relative">
-                          <Select
-                            value={incident.status}
-                            onChange={(e) => handleStatusChange(incident.id.toString(), e.target.value)}
-                            className="w-32"
+                          <Select 
+                            value={incident.status} 
+                            onValueChange={(value) => handleStatusChange(incident.id.toString(), value)}
                             disabled={updatingIncidents.has(incident.id.toString())}
                           >
-                            <option value="PENDING">Pending</option>
-                            <option value="IN_PROGRESS">In Progress</option>
-                            <option value="RESOLVED">Resolved</option>
-                            <option value="CLOSED">Closed</option>
-                            <option value="CANCELLED">Cancelled</option>
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="PENDING">Pending</SelectItem>
+                              <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                              <SelectItem value="RESOLVED">Resolved</SelectItem>
+                              <SelectItem value="CLOSED">Closed</SelectItem>
+                              <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                            </SelectContent>
                           </Select>
                           {updatingIncidents.has(incident.id.toString()) && (
                             <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded">
@@ -281,15 +289,19 @@ export function IncidentsTable({ showFilters = true }: IncidentsTableProps) {
                 <div className="relative">
                   <Select
                     value={incident.status}
-                    onChange={(e) => handleStatusChange(incident.id.toString(), e.target.value)}
-                    className="w-full"
+                    onValueChange={(value) => handleStatusChange(incident.id.toString(), value)}
                     disabled={updatingIncidents.has(incident.id.toString())}
                   >
-                    <option value="PENDING">Pending</option>
-                    <option value="IN_PROGRESS">In Progress</option>
-                    <option value="RESOLVED">Resolved</option>
-                    <option value="CLOSED">Closed</option>
-                    <option value="CANCELLED">Cancelled</option>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PENDING">Pending</SelectItem>
+                      <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                      <SelectItem value="RESOLVED">Resolved</SelectItem>
+                      <SelectItem value="CLOSED">Closed</SelectItem>
+                      <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                    </SelectContent>
                   </Select>
                   {updatingIncidents.has(incident.id.toString()) && (
                     <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded">

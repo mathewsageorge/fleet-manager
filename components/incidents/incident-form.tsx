@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Select } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertCircle, Car, User, Calendar, MapPin, Camera } from 'lucide-react'
 import { ImageUpload } from '@/components/ui/image-upload'
 
@@ -24,8 +24,8 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
   const createMutation = useCreateIncident()
 
   const [formData, setFormData] = useState({
-    carId: initialData?.carId || '',
-    reportedById: initialData?.reportedById || 1, // Default to first user
+    carId: initialData?.carId?.toString() || '',
+    reportedById: initialData?.reportedById?.toString() || '1', // Default to first user
     title: initialData?.title || '',
     description: initialData?.description || '',
     severity: initialData?.severity || 'LOW',
@@ -129,31 +129,35 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Severity</label>
-              <Select
-                value={formData.severity}
-                onChange={(e) => handleChange('severity', e.target.value)}
-              >
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
-                <option value="CRITICAL">Critical</option>
+              <Select value={formData.severity} onValueChange={(value) => handleChange('severity', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="LOW">Low</SelectItem>
+                  <SelectItem value="MEDIUM">Medium</SelectItem>
+                  <SelectItem value="HIGH">High</SelectItem>
+                  <SelectItem value="CRITICAL">Critical</SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
             <div>
               <label className="text-sm font-medium">Type</label>
-              <Select
-                value={formData.type}
-                onChange={(e) => handleChange('type', e.target.value)}
-              >
-                <option value="ACCIDENT">Accident</option>
-                <option value="BREAKDOWN">Breakdown</option>
-                <option value="THEFT">Theft</option>
-                <option value="VANDALISM">Vandalism</option>
-                <option value="MAINTENANCE_ISSUE">Maintenance Issue</option>
-                <option value="TRAFFIC_VIOLATION">Traffic Violation</option>
-                <option value="FUEL_ISSUE">Fuel Issue</option>
-                <option value="OTHER">Other</option>
+              <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACCIDENT">Accident</SelectItem>
+                  <SelectItem value="BREAKDOWN">Breakdown</SelectItem>
+                  <SelectItem value="THEFT">Theft</SelectItem>
+                  <SelectItem value="VANDALISM">Vandalism</SelectItem>
+                  <SelectItem value="MAINTENANCE_ISSUE">Maintenance Issue</SelectItem>
+                  <SelectItem value="TRAFFIC_VIOLATION">Traffic Violation</SelectItem>
+                  <SelectItem value="FUEL_ISSUE">Fuel Issue</SelectItem>
+                  <SelectItem value="OTHER">Other</SelectItem>
+                </SelectContent>
               </Select>
             </div>
           </div>
@@ -170,32 +174,34 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
         <CardContent className="space-y-4">
           <div>
             <label className="text-sm font-medium">Vehicle *</label>
-            <Select
-              value={formData.carId}
-              onChange={(e) => handleChange('carId', e.target.value)}
-              className={errors.carId ? 'border-red-500' : ''}
-            >
-              <option value="">Select a vehicle</option>
-              {cars?.map((car: any) => (
-                <option key={car.id} value={car.id}>
-                  {car.make} {car.model} ({car.licensePlate})
-                </option>
-              ))}
+            <Select value={formData.carId} onValueChange={(value) => handleChange('carId', value)}>
+              <SelectTrigger className={errors.carId ? 'border-red-500' : ''}>
+                <SelectValue placeholder="Select a vehicle" />
+              </SelectTrigger>
+              <SelectContent>
+                {cars && cars.map((car: any) => (
+                  <SelectItem key={car.id} value={car.id.toString()}>
+                    {car.make} {car.model} ({car.licensePlate})
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
             {errors.carId && <p className="text-sm text-red-500 mt-1">{errors.carId}</p>}
           </div>
 
           <div>
             <label className="text-sm font-medium">Reported By</label>
-            <Select
-              value={formData.reportedById}
-              onChange={(e) => handleChange('reportedById', parseInt(e.target.value))}
-            >
-              {users?.map((user: any) => (
-                <option key={user.id} value={user.id}>
-                  {user.name} ({user.email})
-                </option>
-              ))}
+            <Select value={formData.reportedById.toString()} onValueChange={(value) => handleChange('reportedById', parseInt(value))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {users && users.map((user: any) => (
+                  <SelectItem key={user.id} value={user.id.toString()}>
+                    {user.name} ({user.email})
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
         </CardContent>
@@ -280,13 +286,13 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
         </CardHeader>
         <CardContent>
           <div>
-            <label className="text-sm font-medium">Estimated Cost ($)</label>
+            <label className="text-sm font-medium">Estimated Cost (₹)</label>
             <Input
               type="number"
               step="0.01"
               value={formData.estimatedCost}
               onChange={(e) => handleChange('estimatedCost', e.target.value)}
-              placeholder="Optional estimated repair/replacement cost"
+                              placeholder="Optional estimated repair/replacement cost in ₹"
             />
           </div>
         </CardContent>

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Car, AlertTriangle, BarChart3, Menu, X, Plus } from 'lucide-react'
+import { Car, AlertTriangle, BarChart3, Menu, X, Plus, Settings } from 'lucide-react'
 import { NotificationBell } from '@/components/ui/notification-bell'
 import { Providers } from '../providers'
 
@@ -21,6 +21,12 @@ const navigation = [
     href: '/fleetmanager/incidents',
     icon: AlertTriangle,
     description: 'Incident management',
+  },
+  {
+    name: 'Settings',
+    href: '/fleetmanager/settings',
+    icon: Settings,
+    description: 'Admin access required',
   },
 ]
 
