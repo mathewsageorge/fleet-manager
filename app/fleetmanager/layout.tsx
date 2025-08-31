@@ -189,18 +189,7 @@ export default function FleetManagerLayout({
           </main>
         </div>
 
-        {/* Mobile Floating Action Button */}
-        <div className="md:hidden fixed bottom-6 right-6 z-50">
-          <Button
-            asChild
-            size="lg"
-            className="h-14 w-14 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-2xl shadow-emerald-500/30 border-0 hover:scale-110 transition-all duration-200"
-          >
-            <Link href="/fleetmanager/incidents/new" className="flex items-center justify-center">
-              <Plus className="h-6 w-6" />
-            </Link>
-          </Button>
-        </div>
+
       </div>
     </Providers>
   )
