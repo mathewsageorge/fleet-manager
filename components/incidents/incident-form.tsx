@@ -284,16 +284,23 @@ export function IncidentForm({ initialData, isEditing = false, onSubmit, isSubmi
             Location & Time
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 sm:space-y-4">
           <div>
             <label className="text-sm font-medium">When did this occur? *</label>
             <Input
               type="datetime-local"
               value={formData.occurredAt}
               onChange={(e) => handleChange('occurredAt', e.target.value)}
-              className={errors.occurredAt ? 'border-red-500' : ''}
+              className={`w-full ${errors.occurredAt ? 'border-red-500' : ''}`}
+              style={{
+                WebkitAppearance: 'none',
+                MozAppearance: 'none'
+              }}
             />
             {errors.occurredAt && <p className="text-sm text-red-500 mt-1">{errors.occurredAt}</p>}
+            <p className="text-xs text-muted-foreground mt-1">
+              📅 Tap to select date and time
+            </p>
           </div>
 
           <div>

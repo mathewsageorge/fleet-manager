@@ -68,7 +68,7 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
   const [isSearching, setIsSearching] = useState(false)
-  const [manualMode, setManualMode] = useState(false)
+  const [manualMode, setManualMode] = useState(true)
   const [isOffline, setIsOffline] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const suggestionsRef = useRef<HTMLDivElement>(null)
@@ -603,7 +603,7 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
   return (
     <div className={`space-y-3 ${className}`}>
       {/* Search input with buttons */}
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <div className="flex-1 relative">
           <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
@@ -634,11 +634,11 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
             className="pl-9"
           />
 
-          {/* Suggestions Dropdown */}
+          {/* Suggestions Dropdown - Mobile optimized */}
           {showSuggestions && suggestions.length > 0 && (
             <div
               ref={suggestionsRef}
-              className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto"
+              className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 sm:max-h-60 overflow-y-auto"
             >
               {/* Popular cities header */}
               {searchQuery.length === 0 && suggestions.some(s => s.type === 'city') && (
@@ -654,7 +654,7 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
                 return (
                   <div
                     key={uniqueKey}
-                    className={`px-3 py-2 cursor-pointer hover:bg-gray-50 text-sm ${
+                    className={`px-3 py-3 sm:py-2 cursor-pointer hover:bg-gray-50 text-sm ${
                       index === selectedIndex ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
                     }`}
                     onClick={() => selectSuggestion(suggestion)}
@@ -687,53 +687,62 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
             </div>
           )}
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => searchLocation(searchQuery)}
-          disabled={isLoading || !searchQuery.trim() || manualMode || isOffline}
-          size="sm"
-        >
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Search className="h-4 w-4" />
-          )}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={getCurrentLocation}
-          disabled={isLoading}
-          size="sm"
-          title="Get current location"
-        >
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Navigation className="h-4 w-4" />
-          )}
-        </Button>
-        <Button
-          type="button"
-          variant={manualMode ? "default" : "outline"}
-          onClick={() => {
-            setManualMode(!manualMode)
-            if (!manualMode) {
-              // Switching to manual mode - hide suggestions
-              setShowSuggestions(false)
-              setSuggestions([])
-            }
-          }}
-          size="sm"
-          title={manualMode ? "Switch to auto-complete mode" : "Switch to manual entry mode"}
-        >
-          {manualMode ? "✏️ Manual" : "🔍 Auto"}
-        </Button>
+        {/* Mobile-friendly button layout */}
+        <div className="flex gap-1 sm:gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => searchLocation(searchQuery)}
+            disabled={isLoading || !searchQuery.trim() || manualMode || isOffline}
+            size="sm"
+            className="flex-1 sm:flex-none"
+          >
+            {isLoading ? (
+              <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+            ) : (
+              <Search className="h-3 w-3 sm:h-4 sm:w-4" />
+            )}
+            <span className="hidden sm:inline ml-1">Search</span>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={getCurrentLocation}
+            disabled={isLoading}
+            size="sm"
+            title="Get current location"
+            className="flex-1 sm:flex-none"
+          >
+            {isLoading ? (
+              <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+            ) : (
+              <Navigation className="h-3 w-3 sm:h-4 sm:w-4" />
+            )}
+            <span className="hidden sm:inline ml-1">Current</span>
+          </Button>
+          <Button
+            type="button"
+            variant={manualMode ? "default" : "outline"}
+            onClick={() => {
+              setManualMode(!manualMode)
+              if (!manualMode) {
+                // Switching to manual mode - hide suggestions
+                setShowSuggestions(false)
+                setSuggestions([])
+              }
+            }}
+            size="sm"
+            title={manualMode ? "Switch to auto-complete mode" : "Switch to manual entry mode"}
+            className="flex-1 sm:flex-none"
+          >
+            {manualMode ? "✏️" : "🔍"}
+            <span className="hidden sm:inline ml-1">{manualMode ? "Manual" : "Auto"}</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Coordinate inputs */}
-      <div className="grid grid-cols-2 gap-2">
+      {/* Coordinate inputs - Mobile optimized */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <div>
           <Input
             type="number"
