@@ -90,9 +90,20 @@ export default function FleetManagerLayout({
               <div className="flex items-center space-x-3">
                 <NotificationBell />
                 
-                {/* Report New Incident Button */}
-                <Button 
-                  asChild 
+                {/* Report New Incident Button - Compact on mobile */}
+                <Button
+                  asChild
+                  className="flex sm:hidden bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg shadow-emerald-500/25 border-0 px-3 py-2 h-9"
+                >
+                  <Link href="/fleetmanager/incidents/new">
+                    <Plus className="h-4 w-4" />
+                    <span className="sr-only sm:not-sr-only sm:ml-2">Report</span>
+                  </Link>
+                </Button>
+
+                {/* Report New Incident Button - Full on larger screens */}
+                <Button
+                  asChild
                   className="hidden sm:flex bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg shadow-emerald-500/25 border-0"
                 >
                   <Link href="/fleetmanager/incidents/new">
@@ -150,17 +161,19 @@ export default function FleetManagerLayout({
                   )
                 })}
                 
-                {/* Mobile Report Incident Button */}
-                <Button 
-                  asChild 
-                  className="w-full mt-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg border-0"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Link href="/fleetmanager/incidents/new">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Report New Incident
-                  </Link>
-                </Button>
+                {/* Mobile Report Incident Button - Prominent */}
+                <div className="mt-4 p-3 bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl border border-emerald-200">
+                  <Button
+                    asChild
+                    className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg border-0 h-12 text-base font-semibold"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Link href="/fleetmanager/incidents/new">
+                      <Plus className="h-5 w-5 mr-3" />
+                      Report New Incident
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -168,53 +181,25 @@ export default function FleetManagerLayout({
 
         {/* Main content area */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-          <div className="flex gap-6 lg:gap-8">
-            {/* Desktop Sidebar - Simplified */}
-            <aside className="hidden lg:flex lg:flex-col lg:w-64">
-              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-                <h3 className="text-sm font-semibold text-slate-700 mb-4">Navigation</h3>
-                <nav className="space-y-2">
-                  {navigation.map((item) => {
-                    const isActive = pathname === item.href
-                    return (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        className={cn(
-                          'group flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200',
-                          isActive
-                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
-                            : 'text-slate-600 hover:text-slate-800 hover:bg-white/60 hover:shadow-md'
-                        )}
-                      >
-                        <item.icon className={cn(
-                          'h-5 w-5 transition-transform duration-200',
-                          isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-700',
-                          'group-hover:scale-110'
-                        )} />
-                        <div>
-                          <div>{item.name}</div>
-                          <div className={cn(
-                            'text-xs',
-                            isActive ? 'text-blue-100' : 'text-slate-400 group-hover:text-slate-500'
-                          )}>
-                            {item.description}
-                          </div>
-                        </div>
-                      </Link>
-                    )
-                  })}
-                </nav>
-              </div>
-            </aside>
+          {/* Main Content - Full Width */}
+          <main className="w-full">
+            <div className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 lg:p-8">
+              {children}
+            </div>
+          </main>
+        </div>
 
-            {/* Main Content */}
-            <main className="flex-1 min-w-0">
-              <div className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 lg:p-8">
-                {children}
-              </div>
-            </main>
-          </div>
+        {/* Mobile Floating Action Button */}
+        <div className="md:hidden fixed bottom-6 right-6 z-50">
+          <Button
+            asChild
+            size="lg"
+            className="h-14 w-14 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-2xl shadow-emerald-500/30 border-0 hover:scale-110 transition-all duration-200"
+          >
+            <Link href="/fleetmanager/incidents/new" className="flex items-center justify-center">
+              <Plus className="h-6 w-6" />
+            </Link>
+          </Button>
         </div>
       </div>
     </Providers>
