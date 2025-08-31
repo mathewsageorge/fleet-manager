@@ -89,17 +89,39 @@ export default function FleetManagerLayout({
               {/* Actions */}
               <div className="flex items-center space-x-3">
                 <NotificationBell />
-                
-                {/* Report New Incident Button - Compact on mobile */}
-                <Button
-                  asChild
-                  className="flex sm:hidden bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg shadow-emerald-500/25 border-0 px-3 py-2 h-9"
-                >
-                  <Link href="/fleetmanager/incidents/new">
-                    <Plus className="h-4 w-4" />
-                    <span className="sr-only sm:not-sr-only sm:ml-2">Report</span>
-                  </Link>
-                </Button>
+
+                {/* Mobile Navigation Items + Report Button */}
+                <div className="flex items-center space-x-1 md:hidden">
+                  {navigation.map((item) => {
+                    const isActive = pathname === item.href
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={cn(
+                          'flex items-center space-x-1 px-2 py-2 text-xs font-medium rounded-lg transition-all duration-200',
+                          isActive
+                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                            : 'text-slate-600 hover:text-slate-800 hover:bg-white/60'
+                        )}
+                      >
+                        <item.icon className="h-3 w-3" />
+                        <span className="hidden sm:inline">{item.name}</span>
+                      </Link>
+                    )
+                  })}
+
+                  {/* Report New Incident Button */}
+                  <Button
+                    asChild
+                    size="sm"
+                    className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg shadow-emerald-500/25 border-0 px-2 py-2 h-8"
+                  >
+                    <Link href="/fleetmanager/incidents/new">
+                      <Plus className="h-3 w-3" />
+                    </Link>
+                  </Button>
+                </div>
 
                 {/* Report New Incident Button - Full on larger screens */}
                 <Button
