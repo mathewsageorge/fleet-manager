@@ -153,6 +153,16 @@ export const notifications = {
     })
   },
 
+  // Incident updated
+  incidentUpdated: (incident: any) => {
+    notificationStore.add({
+      title: 'Incident Updated',
+      message: `Incident "${incident.title}" has been updated.`,
+      type: 'info',
+      data: { incidentId: incident.id }
+    })
+  },
+
   // System notification
   system: (title: string, message: string, type: 'info' | 'warning' | 'error' | 'success' = 'info') => {
     notificationStore.add({
@@ -162,6 +172,8 @@ export const notifications = {
     })
   }
 }
+
+
 
 // Request notification permission
 export const requestNotificationPermission = async () => {

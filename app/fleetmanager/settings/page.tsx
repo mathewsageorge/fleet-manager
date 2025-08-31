@@ -44,6 +44,11 @@ export default function SettingsPage() {
     setShowPasswordModal(true)
   }
 
+  // Handle tab change with immediate visual feedback
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+  }
+
   // Show loading state while checking authentication
   if (!isAuthState && !showPasswordModal) {
     return (
@@ -104,19 +109,25 @@ export default function SettingsPage() {
         </Card>
 
         {/* Settings Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2">
-            <TabsTrigger value="vehicles" className="flex items-center space-x-2">
+            <TabsTrigger value="vehicles" className="flex items-center space-x-2 transition-all duration-150">
               <Car className="h-4 w-4" />
               <span>Vehicles</span>
             </TabsTrigger>
-            <TabsTrigger value="personnel" className="flex items-center space-x-2">
+            <TabsTrigger value="personnel" className="flex items-center space-x-2 transition-all duration-150">
               <Users className="h-4 w-4" />
               <span>Personnel</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="vehicles" className="space-y-6">
+          <TabsContent
+            value="vehicles"
+            forceMount
+            className={`space-y-6 transition-opacity duration-200 ${
+              activeTab === 'vehicles' ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'
+            }`}
+          >
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -133,7 +144,13 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="personnel" className="space-y-6">
+          <TabsContent
+            value="personnel"
+            forceMount
+            className={`space-y-6 transition-opacity duration-200 ${
+              activeTab === 'personnel' ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'
+            }`}
+          >
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCreateIncident, useCars, useUsers } from '@/lib/queries/incidents'
 import { notifications } from '@/lib/notifications'
@@ -15,26 +15,52 @@ import { ImageUpload } from '@/components/ui/image-upload'
 interface IncidentFormProps {
   initialData?: any
   isEditing?: boolean
+  onSubmit?: (formData: any) => void
+  isSubmitting?: boolean
 }
 
-export function IncidentForm({ initialData, isEditing = false }: IncidentFormProps) {
+interface Car {
+  id: number
+  make: string
+  model: string
+  licensePlate: string
+}
+
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+export function IncidentForm({ initialData, isEditing = false, onSubmit, isSubmitting = false }: IncidentFormProps) {
   const router = useRouter()
   const { data: cars } = useCars()
   const { data: users } = useUsers()
   const createMutation = useCreateIncident()
 
+  // State for feedback management
+  const [createStatus, setCreateStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [createMessage, setCreateMessage] = React.useState('')
+
+  const typedCars = cars as Car[]
+  const typedUsers = users as User[]
+
   const [formData, setFormData] = useState({
     carId: initialData?.carId?.toString() || '',
     reportedById: initialData?.reportedById?.toString() || '1', // Default to first user
+    assignedToId: initialData?.assignedToId?.toString() || '',
     title: initialData?.title || '',
     description: initialData?.description || '',
     severity: initialData?.severity || 'LOW',
+    status: initialData?.status || 'PENDING',
     type: initialData?.type || 'OTHER',
     location: initialData?.location || '',
     latitude: initialData?.latitude || '',
     longitude: initialData?.longitude || '',
     occurredAt: initialData?.occurredAt ? new Date(initialData.occurredAt).toISOString().slice(0, 16) : '',
     estimatedCost: initialData?.estimatedCost || '',
+    actualCost: initialData?.actualCost || '',
+    resolutionNotes: initialData?.resolutionNotes || '',
     images: initialData?.images || [],
   })
 
@@ -65,14 +91,24 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
+
+    if (isEditing && onSubmit) {
+      // Use custom submit handler for editing
+      onSubmit(formData)
+      return
+    }
+
+    // Handle incident creation with feedback
+    setCreateStatus('loading')
+    setCreateMessage('Creating incident...')
 
     try {
       const submitData = {
         ...formData,
         carId: parseInt(formData.carId as string),
-        reportedById: formData.reportedById,
+        reportedById: parseInt(formData.reportedById as string),
         estimatedCost: formData.estimatedCost ? parseFloat(formData.estimatedCost as string) : undefined,
         latitude: formData.latitude ? parseFloat(formData.latitude as string) : undefined,
         longitude: formData.longitude ? parseFloat(formData.longitude as string) : undefined,
@@ -80,17 +116,32 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
       }
 
       const newIncident = await createMutation.mutateAsync(submitData)
-      
+
       // Send notification based on severity
       if (submitData.severity === 'CRITICAL') {
         notifications.criticalIncident(newIncident)
       } else {
         notifications.newIncident(newIncident)
       }
-      
-      router.push('/fleetmanager/incidents')
+
+      // Show success message
+      setCreateStatus('success')
+      setCreateMessage('Incident created successfully!')
+
+      // Navigate after a brief delay
+      setTimeout(() => {
+        router.push('/fleetmanager/incidents')
+      }, 1500)
     } catch (error) {
       console.error('Failed to create incident:', error)
+      setCreateStatus('error')
+      setCreateMessage('Failed to create incident. Please try again.')
+
+      // Clear error message after 5 seconds
+      setTimeout(() => {
+        setCreateStatus('idle')
+        setCreateMessage('')
+      }, 5000)
     }
   }
 
@@ -179,7 +230,7 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
                 <SelectValue placeholder="Select a vehicle" />
               </SelectTrigger>
               <SelectContent>
-                {cars && cars.map((car: any) => (
+                {typedCars && typedCars.map((car: Car) => (
                   <SelectItem key={car.id} value={car.id.toString()}>
                     {car.make} {car.model} ({car.licensePlate})
                   </SelectItem>
@@ -191,12 +242,12 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
 
           <div>
             <label className="text-sm font-medium">Reported By</label>
-            <Select value={formData.reportedById.toString()} onValueChange={(value) => handleChange('reportedById', parseInt(value))}>
+            <Select value={formData.reportedById} onValueChange={(value) => handleChange('reportedById', value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {users && users.map((user: any) => (
+                {typedUsers && typedUsers.map((user: User) => (
                   <SelectItem key={user.id} value={user.id.toString()}>
                     {user.name} ({user.email})
                   </SelectItem>
@@ -204,6 +255,24 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
               </SelectContent>
             </Select>
           </div>
+
+          {isEditing && (
+            <div>
+              <label className="text-sm font-medium">Assigned To</label>
+              <Select value={formData.assignedToId} onValueChange={(value) => handleChange('assignedToId', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select assignee (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {typedUsers && typedUsers.map((user: User) => (
+                    <SelectItem key={user.id} value={user.id.toString()}>
+                      {user.name} ({user.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -285,26 +354,92 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
           <CardTitle>Cost Estimation</CardTitle>
         </CardHeader>
         <CardContent>
-          <div>
-            <label className="text-sm font-medium">Estimated Cost (₹)</label>
-            <Input
-              type="number"
-              step="0.01"
-              value={formData.estimatedCost}
-              onChange={(e) => handleChange('estimatedCost', e.target.value)}
-                              placeholder="Optional estimated repair/replacement cost in ₹"
-            />
-          </div>
+          {isEditing ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Estimated Cost (₹)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={formData.estimatedCost}
+                  onChange={(e) => handleChange('estimatedCost', e.target.value)}
+                  placeholder="Optional estimated repair/replacement cost in ₹"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Actual Cost (₹)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={formData.actualCost}
+                  onChange={(e) => handleChange('actualCost', e.target.value)}
+                  placeholder="Actual repair/replacement cost in ₹"
+                />
+              </div>
+            </div>
+          ) : (
+            <div>
+              <label className="text-sm font-medium">Estimated Cost (₹)</label>
+              <Input
+                type="number"
+                step="0.01"
+                value={formData.estimatedCost}
+                onChange={(e) => handleChange('estimatedCost', e.target.value)}
+                placeholder="Optional estimated repair/replacement cost in ₹"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {isEditing && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Resolution & Status
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Status</label>
+              <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PENDING">Pending</SelectItem>
+                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                  <SelectItem value="RESOLVED">Resolved</SelectItem>
+                  <SelectItem value="CLOSED">Closed</SelectItem>
+                  <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Resolution Notes</label>
+              <Textarea
+                value={formData.resolutionNotes}
+                onChange={(e) => handleChange('resolutionNotes', e.target.value)}
+                placeholder="Describe how the incident was resolved..."
+                rows={3}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="flex gap-4">
         <Button
           type="submit"
-          disabled={createMutation.isPending}
+          disabled={createMutation.isPending || isSubmitting}
           className="flex-1"
         >
-          {createMutation.isPending ? 'Creating...' : isEditing ? 'Update Incident' : 'Create Incident'}
+          {(createMutation.isPending || isSubmitting)
+            ? (isEditing ? 'Updating...' : 'Creating...')
+            : (isEditing ? 'Update Incident' : 'Create Incident')
+          }
         </Button>
         <Button
           type="button"
@@ -312,9 +447,43 @@ export function IncidentForm({ initialData, isEditing = false }: IncidentFormPro
           onClick={() => router.back()}
           className="flex-1"
         >
-          Cancel
+          {isEditing ? 'Cancel Edit' : 'Cancel'}
         </Button>
       </div>
+
+      {/* Status Message Below Form - Only for creation */}
+      {!isEditing && createMessage && (
+        <Card className={`border-l-4 ${
+          createStatus === 'success'
+            ? 'border-l-green-500 bg-green-50'
+            : createStatus === 'error'
+            ? 'border-l-red-500 bg-red-50'
+            : 'border-l-blue-500 bg-blue-50'
+        }`}>
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2">
+              {createStatus === 'loading' && (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              )}
+              {createStatus === 'success' && (
+                <div className="text-green-600 font-medium text-lg">✓</div>
+              )}
+              {createStatus === 'error' && (
+                <div className="text-red-600 font-medium text-lg">✗</div>
+              )}
+              <p className={`text-sm font-medium ${
+                createStatus === 'success'
+                  ? 'text-green-800'
+                  : createStatus === 'error'
+                  ? 'text-red-800'
+                  : 'text-blue-800'
+              }`}>
+                {createMessage}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </form>
   )
 }

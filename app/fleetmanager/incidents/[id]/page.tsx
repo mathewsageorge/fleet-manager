@@ -7,10 +7,43 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { formatDateTime, formatCurrency, getSeverityColor, getStatusColor } from '@/lib/utils'
-import { ArrowLeft, MapPin, Clock, DollarSign, User, MessageSquare, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, DollarSign, User, MessageSquare, Image as ImageIcon, Edit } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
+
+interface Incident {
+  id: number
+  title: string
+  description: string
+  status: string
+  severity: string
+  type: string
+  occurredAt: string
+  reportedAt: string
+  location?: string
+  latitude?: number
+  longitude?: number
+  estimatedCost?: number
+  actualCost?: number
+  resolutionNotes?: string
+  resolvedAt?: string
+  images?: string[]
+  car: {
+    make: string
+    model: string
+    licensePlate: string
+  }
+  reportedBy: {
+    name: string
+    email: string
+  }
+  assignedTo?: {
+    name: string
+    email: string
+  }
+  updates?: any[]
+}
 
 export default function IncidentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = React.use(params)
@@ -29,8 +62,8 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
       setComment('')
       
       // Send notification for new comment
-      if (incident) {
-        notifications.newComment(incident, newComment)
+      if (typedIncident) {
+        notifications.newComment(typedIncident, newComment)
       }
     } catch (error) {
       console.error('Failed to add comment:', error)
@@ -77,6 +110,8 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
     )
   }
 
+  const typedIncident = incident as Incident
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -88,17 +123,23 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
             </Link>
           </Button>
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">{incident.title}</h2>
-            <p className="text-muted-foreground">Incident #{incident.id}</p>
+            <h2 className="text-3xl font-bold tracking-tight">{typedIncident.title}</h2>
+            <p className="text-muted-foreground">Incident #{typedIncident.id}</p>
           </div>
         </div>
         <div className="flex gap-2">
-          <Badge className={getStatusColor(incident.status)}>
-            {incident.status.replace('_', ' ')}
+          <Badge className={getStatusColor(typedIncident.status)}>
+            {typedIncident.status.replace('_', ' ')}
           </Badge>
-          <Badge className={getSeverityColor(incident.severity)}>
-            {incident.severity}
+          <Badge className={getSeverityColor(typedIncident.severity)}>
+            {typedIncident.severity}
           </Badge>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/fleetmanager/incidents/${resolvedParams.id}/edit`}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -111,7 +152,7 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
           <CardContent className="space-y-4">
             <div>
               <h4 className="font-medium">Description</h4>
-              <p className="text-sm text-muted-foreground">{incident.description}</p>
+              <p className="text-sm text-muted-foreground">{typedIncident.description}</p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
@@ -121,13 +162,13 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
                   Occurred At
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  {formatDateTime(incident.occurredAt)}
+                  {formatDateTime(typedIncident.occurredAt)}
                 </p>
               </div>
               <div>
                 <h4 className="font-medium">Reported At</h4>
                 <p className="text-sm text-muted-foreground">
-                  {formatDateTime(incident.reportedAt)}
+                  {formatDateTime(typedIncident.reportedAt)}
                 </p>
               </div>
             </div>
@@ -135,20 +176,20 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
             <div>
               <h4 className="font-medium">Type</h4>
               <p className="text-sm text-muted-foreground">
-                {incident.type.replace('_', ' ')}
+                {typedIncident.type.replace('_', ' ')}
               </p>
             </div>
 
-            {incident.location && (
+            {typedIncident.location && (
               <div>
                 <h4 className="font-medium flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
                   Location
                 </h4>
-                <p className="text-sm text-muted-foreground">{incident.location}</p>
-                {incident.latitude && incident.longitude && (
+                <p className="text-sm text-muted-foreground">{typedIncident.location}</p>
+                {typedIncident.latitude && typedIncident.longitude && (
                   <p className="text-xs text-muted-foreground">
-                    GPS: {incident.latitude}, {incident.longitude}
+                    GPS: {typedIncident.latitude}, {typedIncident.longitude}
                   </p>
                 )}
               </div>
@@ -165,7 +206,7 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
             <div>
               <h4 className="font-medium">Vehicle</h4>
               <p className="text-sm text-muted-foreground">
-                {incident.car.make} {incident.car.model} ({incident.car.licensePlate})
+                {typedIncident.car.make} {typedIncident.car.model} ({typedIncident.car.licensePlate})
               </p>
             </div>
 
@@ -175,23 +216,24 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
                 Reported By
               </h4>
               <p className="text-sm text-muted-foreground">
-                {incident.reportedBy.name} ({incident.reportedBy.email})
+                {typedIncident.reportedBy.name} ({typedIncident.reportedBy.email})
               </p>
             </div>
 
-            {incident.assignedTo && (
-              <div>
-                <h4 className="font-medium">Assigned To</h4>
-                <p className="text-sm text-muted-foreground">
-                  {incident.assignedTo.name} ({incident.assignedTo.email})
-                </p>
-              </div>
-            )}
+            <div>
+              <h4 className="font-medium">Assigned To</h4>
+              <p className="text-sm text-muted-foreground">
+                {typedIncident.assignedTo
+                  ? `${typedIncident.assignedTo.name} (${typedIncident.assignedTo.email})`
+                  : 'Unassigned'
+                }
+              </p>
+            </div>
           </CardContent>
         </Card>
 
         {/* Cost Information */}
-        {(incident.estimatedCost || incident.actualCost) && (
+        {(typedIncident.estimatedCost || typedIncident.actualCost) && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -200,19 +242,19 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {incident.estimatedCost && (
+              {typedIncident.estimatedCost && (
                 <div>
                   <h4 className="font-medium">Estimated Cost</h4>
                   <p className="text-sm text-muted-foreground">
-                    {formatCurrency(incident.estimatedCost)}
+                    {formatCurrency(typedIncident.estimatedCost)}
                   </p>
                 </div>
               )}
-              {incident.actualCost && (
+              {typedIncident.actualCost && (
                 <div>
                   <h4 className="font-medium">Actual Cost</h4>
                   <p className="text-sm text-muted-foreground">
-                    {formatCurrency(incident.actualCost)}
+                    {formatCurrency(typedIncident.actualCost)}
                   </p>
                 </div>
               )}
@@ -221,17 +263,17 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
         )}
 
         {/* Images */}
-        {incident.images && incident.images.length > 0 && (
+        {typedIncident.images && typedIncident.images.length > 0 && (
           <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ImageIcon className="h-4 w-4" />
-                Incident Photos ({incident.images.length})
+                Incident Photos ({typedIncident.images.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {incident.images.map((imageUrl: string, index: number) => (
+                {typedIncident.images.map((imageUrl: string, index: number) => (
                   <div key={index} className="relative aspect-square rounded-lg overflow-hidden border">
                     <Image
                       src={imageUrl}
@@ -251,17 +293,38 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
         )}
 
         {/* Resolution */}
-        {incident.resolutionNotes && (
+        {(typedIncident.resolutionNotes || typedIncident.actualCost || typedIncident.status === 'RESOLVED') && (
           <Card>
             <CardHeader>
               <CardTitle>Resolution</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">{incident.resolutionNotes}</p>
-              {incident.resolvedAt && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  Resolved at: {formatDateTime(incident.resolvedAt)}
-                </p>
+            <CardContent className="space-y-4">
+              {typedIncident.resolutionNotes && (
+                <div>
+                  <h4 className="font-medium">Resolution Notes</h4>
+                  <p className="text-sm text-muted-foreground">{typedIncident.resolutionNotes}</p>
+                </div>
+              )}
+              {typedIncident.actualCost && (
+                <div>
+                  <h4 className="font-medium">Actual Cost</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {formatCurrency(typedIncident.actualCost)}
+                  </p>
+                </div>
+              )}
+              {typedIncident.resolvedAt && (
+                <div>
+                  <h4 className="font-medium">Resolution Date</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {formatDateTime(typedIncident.resolvedAt)}
+                  </p>
+                </div>
+              )}
+              {typedIncident.status === 'RESOLVED' && !typedIncident.resolvedAt && (
+                <div>
+                  <p className="text-sm text-green-600 font-medium">✓ This incident has been resolved</p>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -296,7 +359,7 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Updates List */}
           <div className="space-y-3">
-            {incident.updates?.map((update: any) => (
+            {typedIncident.updates?.map((update: any) => (
               <div key={update.id} className="border rounded-lg p-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -316,8 +379,8 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
             ))}
-            
-            {(!incident.updates || incident.updates.length === 0) && (
+
+            {(!typedIncident.updates || typedIncident.updates.length === 0) && (
               <p className="text-sm text-muted-foreground text-center py-4">
                 No updates yet. Be the first to add a comment!
               </p>

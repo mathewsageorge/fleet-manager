@@ -40,10 +40,14 @@ export function CarsManagement() {
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
   const queryClient = useQueryClient()
 
-  // Fetch cars
+  // Fetch cars with optimized caching
   const { data: cars = [], isLoading, error } = useQuery({
     queryKey: ['cars'],
     queryFn: () => apiClient.get('/api/cars'),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   })
 
   // Create car mutation
@@ -118,7 +122,46 @@ export function CarsManagement() {
   }
 
   if (isLoading) {
-    return <div className="text-center py-8">Loading cars...</div>
+    return (
+      <div className="space-y-6">
+        {/* Header skeleton */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <div className="h-10 bg-gray-200 rounded w-full sm:w-64 animate-pulse"></div>
+            <div className="h-10 bg-gray-200 rounded w-full sm:w-32 animate-pulse"></div>
+            <div className="h-10 bg-gray-200 rounded w-full sm:w-40 animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Grid skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className="border rounded-lg p-4 space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="space-y-2 flex-1">
+                  <div className="h-5 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                </div>
+                <div className="h-6 bg-gray-200 rounded w-16 animate-pulse"></div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+              </div>
+              <div className="flex items-center justify-end space-x-2 pt-4 border-t">
+                <div className="h-8 bg-gray-200 rounded w-16 animate-pulse"></div>
+                <div className="h-8 bg-gray-200 rounded w-16 animate-pulse"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   if (error) {
