@@ -5,7 +5,6 @@
     }
   },
   "env": {
-    "NEXT_PUBLIC_APP_URL": "https://your-app-name.vercel.app",
-    "DATABASE_URL": "@database_url"
+    "NEXT_PUBLIC_APP_URL": "https://your-app-name.vercel.app"
   }
 }
