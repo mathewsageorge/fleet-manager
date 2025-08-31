@@ -119,28 +119,28 @@ export function AdvancedAnalytics() {
           <Card key={metric.title} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg hover:scale-[1.02] overflow-hidden relative">
             <div className={`h-1 bg-gradient-to-r ${metric.color}`} />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 pt-4">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 {metric.title}
               </CardTitle>
-              <div className={`p-2.5 rounded-xl ${metric.iconBg} group-hover:scale-110 transition-transform duration-200 shadow-sm`}>
-                <metric.icon className="h-4 w-4" />
+              <div className={`p-2 sm:p-2.5 rounded-xl ${metric.iconBg} group-hover:scale-110 transition-transform duration-200 shadow-sm`}>
+                <metric.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </div>
             </CardHeader>
             <CardContent className="pb-4">
               <div className="flex items-end justify-between">
                 <div>
-                  <div className="text-3xl font-bold text-foreground mb-1">
+                  <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">
                     {metric.value}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {metric.description}
                   </p>
                 </div>
-                <div className="flex items-center text-xs">
+                <div className="flex items-center text-xs ml-2 sm:ml-0">
                   {metric.trend.trend === 'up' ? (
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
+                    <TrendingUp className="h-3 w-3 text-green-500 mr-1 flex-shrink-0" />
                   ) : (
-                    <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
+                    <TrendingDown className="h-3 w-3 text-red-500 mr-1 flex-shrink-0" />
                   )}
                   <span className={metric.trend.trend === 'up' ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
                     {metric.trend.percentage}%
@@ -160,9 +160,9 @@ export function AdvancedAnalytics() {
         <Card className="shadow-lg border-0 overflow-hidden">
           <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-600" />
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-blue-100 text-blue-600 shadow-sm">
-                <Activity className="h-5 w-5" />
+            <CardTitle className="text-base sm:text-lg font-semibold flex items-center gap-2 sm:gap-3">
+              <div className="p-2 sm:p-2.5 rounded-xl bg-blue-100 text-blue-600 shadow-sm">
+                <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
               Status Distribution
             </CardTitle>
@@ -181,22 +181,22 @@ export function AdvancedAnalytics() {
               }
               const colors = getStatusColor(status)
               return (
-                <div key={status} className="p-4 rounded-xl bg-gradient-to-r from-muted/30 to-muted/50 hover:from-muted/40 hover:to-muted/60 transition-all duration-200 group">
+                <div key={status} className="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-muted/30 to-muted/50 hover:from-muted/40 hover:to-muted/60 transition-all duration-200 group">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Badge className={`${colors.bg} text-white border-0 text-xs font-medium px-3 py-1 shadow-sm`}>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <Badge className={`${colors.bg} text-white border-0 text-xs font-medium px-2 sm:px-3 py-1 shadow-sm`}>
                         {status.replace('_', ' ')}
                       </Badge>
-                      <span className="font-semibold text-lg">{count}</span>
+                      <span className="font-semibold text-base sm:text-lg">{count}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-24 h-2.5 bg-gray-200 rounded-full overflow-hidden shadow-inner">
-                        <div 
+                      <div className="w-16 sm:w-20 lg:w-24 h-2.5 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                        <div
                           className={`h-full bg-gradient-to-r ${colors.gradient} rounded-full transition-all duration-700 ease-out`}
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
-                      <span className="text-sm font-semibold text-muted-foreground min-w-[2.5rem] text-right">
+                      <span className="text-xs sm:text-sm font-semibold text-muted-foreground min-w-[2rem] sm:min-w-[2.5rem] text-right">
                         {percentage}%
                       </span>
                     </div>
@@ -211,9 +211,9 @@ export function AdvancedAnalytics() {
         <Card className="shadow-lg border-0 overflow-hidden">
           <div className="h-1 bg-gradient-to-r from-red-500 to-orange-600" />
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-red-100 text-red-600 shadow-sm">
-                <AlertTriangle className="h-5 w-5" />
+            <CardTitle className="text-base sm:text-lg font-semibold flex items-center gap-2 sm:gap-3">
+              <div className="p-2 sm:p-2.5 rounded-xl bg-red-100 text-red-600 shadow-sm">
+                <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
               Severity Distribution
             </CardTitle>
@@ -232,22 +232,22 @@ export function AdvancedAnalytics() {
               }
               const colors = getSeverityColors(severity)
               return (
-                <div key={severity} className="p-4 rounded-xl bg-gradient-to-r from-muted/30 to-muted/50 hover:from-muted/40 hover:to-muted/60 transition-all duration-200 group">
+                <div key={severity} className="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-muted/30 to-muted/50 hover:from-muted/40 hover:to-muted/60 transition-all duration-200 group">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Badge className={`${colors.bg} text-white border-0 text-xs font-medium px-3 py-1 shadow-sm`}>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <Badge className={`${colors.bg} text-white border-0 text-xs font-medium px-2 sm:px-3 py-1 shadow-sm`}>
                         {severity}
                       </Badge>
-                      <span className="font-semibold text-lg">{count}</span>
+                      <span className="font-semibold text-base sm:text-lg">{count}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-24 h-2.5 bg-gray-200 rounded-full overflow-hidden shadow-inner">
-                        <div 
+                      <div className="w-16 sm:w-20 lg:w-24 h-2.5 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                        <div
                           className={`h-full bg-gradient-to-r ${colors.gradient} rounded-full transition-all duration-700 ease-out`}
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
-                      <span className="text-sm font-semibold text-muted-foreground min-w-[2.5rem] text-right">
+                      <span className="text-xs sm:text-sm font-semibold text-muted-foreground min-w-[2rem] sm:min-w-[2.5rem] text-right">
                         {percentage}%
                       </span>
                     </div>

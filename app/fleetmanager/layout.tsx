@@ -43,16 +43,16 @@ export default function FleetManagerLayout({
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         {/* Header */}
         <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200/60 shadow-sm">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
+          <div className="container mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
+            <div className="flex items-center justify-between h-14 sm:h-16">
               {/* Logo and title */}
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                    <Car className="h-6 w-6 text-white" />
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg sm:rounded-xl shadow-lg">
+                    <Car className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
                   <div className="hidden sm:block">
-                    <h1 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                    <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                       Fleet Manager
                     </h1>
                     <p className="text-xs text-muted-foreground">Vehicle Management System</p>
@@ -202,10 +202,10 @@ export default function FleetManagerLayout({
         </header>
 
         {/* Main content area */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        <div className="container mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
           {/* Main Content - Full Width */}
           <main className="w-full">
-            <div className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 lg:p-8">
+            <div className="bg-white/40 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6 lg:p-8">
               {children}
             </div>
           </main>
