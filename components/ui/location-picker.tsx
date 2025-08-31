@@ -151,7 +151,7 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
         console.log('Trying Google reverse geocoding...')
 
         const response = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${GOOGLE_API_KEY}&language=en&result_type=establishment|geocode&location_type=ROOFTOP|RANGE_INTERPOLATED&components=country:IN`
+          `/api/geocode?latlng=${lat},${lon}`
         )
 
         if (!response.ok) {
@@ -207,7 +207,7 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
       if (GOOGLE_API_KEY) {
         try {
           hasUsedGoogle = true
-          console.log('Trying Google Places API...')
+          console.log('Trying Google Places API via Next.js route...')
 
           // Southern India location bias (Kochi coordinates as center)
           const SOUTH_INDIA_BOUNDS = {
@@ -216,7 +216,7 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
           }
 
           const response = await fetch(
-            `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&key=${GOOGLE_API_KEY}&types=establishment|geocode&components=country:IN&location=${9.9312},${76.2673}&radius=600000&strictbounds=true`
+            `/api/places/autocomplete?input=${encodeURIComponent(query)}`
           )
 
           if (!response.ok) {
@@ -245,7 +245,7 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
             console.warn('Google Places API error:', data.status, data.error_message)
           }
         } catch (googleError) {
-          console.warn('Google Places API failed, falling back to OpenStreetMap:', googleError)
+          console.warn('Google Places API failed (CORS/API issue), falling back to OpenStreetMap:', googleError)
         }
       }
 
@@ -297,7 +297,7 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
           console.log('Getting coordinates for place:', (suggestion as any).place_id)
 
           const response = await fetch(
-            `https://maps.googleapis.com/maps/api/place/details/json?place_id=${(suggestion as any).place_id}&key=${GOOGLE_API_KEY}&fields=geometry`
+            `/api/places/details?place_id=${(suggestion as any).place_id}`
           )
 
           if (!response.ok) {
@@ -442,7 +442,7 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
       // Try Google Maps Geocoding API first if API key is available
       if (GOOGLE_API_KEY) {
         const response = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${GOOGLE_API_KEY}&language=en&components=country:IN`
+          `/api/geocode?address=${encodeURIComponent(query)}`
         )
         const data = await response.json()
 
@@ -646,15 +646,20 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
                   🇮🇳 Popular Southern Indian Cities
                 </div>
               )}
-              {suggestions.map((suggestion, index) => (
-                <div
-                  key={`${suggestion.lat}-${suggestion.lon}`}
-                  className={`px-3 py-2 cursor-pointer hover:bg-gray-50 text-sm ${
-                    index === selectedIndex ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                  }`}
-                  onClick={() => selectSuggestion(suggestion)}
-                  onMouseEnter={() => setSelectedIndex(index)}
-                >
+              {suggestions.map((suggestion, index) => {
+                // Create a unique key using multiple fields to avoid duplicates
+                const uniqueKey = (suggestion as any).place_id ||
+                  `${suggestion.display_name}-${suggestion.lat || 'no-lat'}-${suggestion.lon || 'no-lon'}-${index}`
+
+                return (
+                  <div
+                    key={uniqueKey}
+                    className={`px-3 py-2 cursor-pointer hover:bg-gray-50 text-sm ${
+                      index === selectedIndex ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                    }`}
+                    onClick={() => selectSuggestion(suggestion)}
+                    onMouseEnter={() => setSelectedIndex(index)}
+                  >
                   <div className="flex items-start gap-2">
                     <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
@@ -667,7 +672,8 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
                     </div>
                   </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
 
@@ -766,7 +772,7 @@ export function LocationPicker({ value, onChange, placeholder = "Search southern
         {!isOffline && (
           <>
             {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? (
-              <>🌐 Using Google Maps for enhanced location search in southern India.</>
+              <>🌐 Using Google Maps for enhanced location search.</>
             ) : (
               <>🗺️ Using OpenStreetMap for southern India-focused search (add Google Maps API key for better results).</>
             )}
