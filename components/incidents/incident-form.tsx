@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertCircle, Car, User, Calendar, MapPin, Camera } from 'lucide-react'
 import { ImageUpload } from '@/components/ui/image-upload'
+import { LocationPicker } from '@/components/ui/location-picker'
 
 interface IncidentFormProps {
   initialData?: any
@@ -297,35 +298,19 @@ export function IncidentForm({ initialData, isEditing = false, onSubmit, isSubmi
 
           <div>
             <label className="text-sm font-medium">Location</label>
-            <Input
-              value={formData.location}
-              onChange={(e) => handleChange('location', e.target.value)}
-              placeholder="Address or description of location"
+            <LocationPicker
+              value={{
+                location: formData.location,
+                latitude: formData.latitude,
+                longitude: formData.longitude
+              }}
+              onChange={(locationData) => {
+                handleChange('location', locationData.location)
+                handleChange('latitude', locationData.latitude)
+                handleChange('longitude', locationData.longitude)
+              }}
+              placeholder="Search for incident location or use current location"
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium">Latitude</label>
-              <Input
-                type="number"
-                step="any"
-                value={formData.latitude}
-                onChange={(e) => handleChange('latitude', e.target.value)}
-                placeholder="Optional GPS coordinate"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium">Longitude</label>
-              <Input
-                type="number"
-                step="any"
-                value={formData.longitude}
-                onChange={(e) => handleChange('longitude', e.target.value)}
-                placeholder="Optional GPS coordinate"
-              />
-            </div>
           </div>
         </CardContent>
       </Card>
