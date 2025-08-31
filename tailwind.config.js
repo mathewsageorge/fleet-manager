@@ -65,10 +65,40 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
+        "slide-in-from-right-2": {
+          from: { transform: "translateX(8px)", opacity: 0 },
+          to: { transform: "translateX(0)", opacity: 1 },
+        },
+        "slide-in-from-left-2": {
+          from: { transform: "translateX(-8px)", opacity: 0 },
+          to: { transform: "translateX(0)", opacity: 1 },
+        },
+        "slide-out-to-left-2": {
+          from: { transform: "translateX(0)", opacity: 1 },
+          to: { transform: "translateX(-8px)", opacity: 0 },
+        },
+        "slide-out-to-right-2": {
+          from: { transform: "translateX(0)", opacity: 1 },
+          to: { transform: "translateX(8px)", opacity: 0 },
+        },
+        "fade-in-0": {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        },
+        "fade-out-0": {
+          from: { opacity: 1 },
+          to: { opacity: 0 },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "slide-in-from-right-2": "slide-in-from-right-2 0.3s ease-in-out",
+        "slide-in-from-left-2": "slide-in-from-left-2 0.3s ease-in-out",
+        "slide-out-to-left-2": "slide-out-to-left-2 0.3s ease-in-out",
+        "slide-out-to-right-2": "slide-out-to-right-2 0.3s ease-in-out",
+        "fade-in-0": "fade-in-0 0.3s ease-in-out",
+        "fade-out-0": "fade-out-0 0.3s ease-in-out",
       },
     },
   },

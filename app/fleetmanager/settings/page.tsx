@@ -116,7 +116,7 @@ export default function SettingsPage() {
           <TabsList className="grid w-full grid-cols-2 h-auto p-1 md:p-2">
             <TabsTrigger
               value="vehicles"
-              className="flex items-center justify-center space-x-1 md:space-x-2 transition-all duration-150 py-2 md:py-3 text-xs md:text-sm"
+              className="flex items-center justify-center space-x-1 md:space-x-2 transition-all duration-200 py-2 md:py-3 text-xs md:text-sm"
             >
               <Car className="h-3 w-3 md:h-4 md:w-4" />
               <span className="hidden sm:inline">Vehicles</span>
@@ -124,7 +124,7 @@ export default function SettingsPage() {
             </TabsTrigger>
             <TabsTrigger
               value="personnel"
-              className="flex items-center justify-center space-x-1 md:space-x-2 transition-all duration-150 py-2 md:py-3 text-xs md:text-sm"
+              className="flex items-center justify-center space-x-1 md:space-x-2 transition-all duration-200 py-2 md:py-3 text-xs md:text-sm"
             >
               <Users className="h-3 w-3 md:h-4 md:w-4" />
               <span className="hidden sm:inline">Personnel</span>
@@ -132,51 +132,47 @@ export default function SettingsPage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent
-            value="vehicles"
-            forceMount
-            className={`space-y-6 transition-opacity duration-200 ${
-              activeTab === 'vehicles' ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'
-            }`}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Car className="h-5 w-5" />
-                  <span>Vehicle Management</span>
-                </CardTitle>
-                <CardDescription>
-                  Add, edit, and manage your fleet vehicles. Track vehicle details, status, and maintenance history.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <CarsManagement />
-              </CardContent>
-            </Card>
-          </TabsContent>
+          <div className="relative overflow-hidden">
+            <TabsContent
+              value="vehicles"
+              className="space-y-6 data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0 data-[state=inactive]:slide-out-to-left-2 data-[state=active]:slide-in-from-right-2 transition-all duration-300 ease-in-out"
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Car className="h-5 w-5" />
+                    <span>Vehicle Management</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Add, edit, and manage your fleet vehicles. Track vehicle details, status, and maintenance history.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CarsManagement />
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          <TabsContent
-            value="personnel"
-            forceMount
-            className={`space-y-6 transition-opacity duration-200 ${
-              activeTab === 'personnel' ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'
-            }`}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Users className="h-5 w-5" />
-                  <span>Personnel Management</span>
-                </CardTitle>
-                <CardDescription>
-                  Manage drivers, fleet managers, and administrators. Assign roles and track personnel information.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PersonnelManagement />
-              </CardContent>
-            </Card>
-          </TabsContent>
+            <TabsContent
+              value="personnel"
+              className="space-y-6 data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0 data-[state=inactive]:slide-out-to-right-2 data-[state=active]:slide-in-from-left-2 transition-all duration-300 ease-in-out"
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Users className="h-5 w-5" />
+                    <span>Personnel Management</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Manage drivers, fleet managers, and administrators. Assign roles and track personnel information.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PersonnelManagement />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
 
