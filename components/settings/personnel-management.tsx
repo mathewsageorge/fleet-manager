@@ -46,6 +46,8 @@ export function PersonnelManagement() {
     refetchOnMount: false,
   })
 
+  const personnelData = personnel as Personnel[]
+
   // Create personnel mutation
   const createPersonnelMutation = useMutation({
     mutationFn: (data: PersonnelFormData) => apiClient.post('/api/users', data),
@@ -76,7 +78,7 @@ export function PersonnelManagement() {
   })
 
   // Filter personnel
-  const filteredPersonnel = personnel.filter((person: Personnel) => {
+  const filteredPersonnel = personnelData.filter((person: Personnel) => {
     const matchesSearch = 
       person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       person.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -181,26 +183,40 @@ export function PersonnelManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Header with search and filters */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Users className="h-5 w-5 text-slate-600" />
-          <h3 className="text-lg font-semibold">Personnel ({filteredPersonnel.length})</h3>
+      {/* Header with search and filters - Mobile Optimized */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Users className="h-4 w-4 md:h-5 md:w-5 text-slate-600" />
+            <h3 className="text-base md:text-lg font-semibold">Personnel ({filteredPersonnel.length})</h3>
+          </div>
+
+          <Button
+            onClick={() => {
+              setEditingPersonnel(null)
+              setIsModalOpen(true)
+            }}
+            className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white w-full sm:w-auto"
+            size="sm"
+          >
+            <Plus className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
+            <span className="text-xs md:text-sm">Add Personnel</span>
+          </Button>
         </div>
-        
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+
+        <div className="flex flex-col sm:flex-row gap-2 w-full">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 md:h-4 md:w-4 text-slate-400" />
             <Input
               placeholder="Search personnel..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full sm:w-64"
+              className="pl-9 md:pl-10 w-full text-sm"
             />
           </div>
-          
+
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-full sm:w-40">
+            <SelectTrigger className="w-full sm:w-40 h-9 md:h-10">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -210,75 +226,65 @@ export function PersonnelManagement() {
               <SelectItem value="ADMIN">Administrators</SelectItem>
             </SelectContent>
           </Select>
-          
-          <Button
-            onClick={() => {
-              setEditingPersonnel(null)
-              setIsModalOpen(true)
-            }}
-            className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Personnel
-          </Button>
         </div>
       </div>
 
-      {/* Personnel Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Personnel Grid - Mobile Optimized */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
         {filteredPersonnel.map((person: Personnel) => (
           <Card key={person.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 md:pb-3">
               <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                    <User className="h-5 w-5 text-white" />
+                <div className="flex items-center space-x-2 md:space-x-3 flex-1 min-w-0">
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="h-4 w-4 md:h-5 md:w-5 text-white" />
                   </div>
-                  <div>
-                    <CardTitle className="text-lg">{person.name}</CardTitle>
-                    <CardDescription className="text-sm flex items-center">
-                      <Mail className="h-3 w-3 mr-1" />
-                      {person.email}
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base md:text-lg truncate">{person.name}</CardTitle>
+                    <CardDescription className="text-xs md:text-sm flex items-center truncate">
+                      <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
+                      <span className="truncate">{person.email}</span>
                     </CardDescription>
                   </div>
                 </div>
-                <Badge className={getRoleColor(person.role)}>
+                <Badge className={`${getRoleColor(person.role)} text-xs ml-2 flex-shrink-0`}>
                   {getRoleLabel(person.role)}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="space-y-2 text-sm text-slate-600">
+              <div className="space-y-1 md:space-y-2 text-xs md:text-sm text-slate-600">
                 <div className="flex justify-between">
-                  <span>Incidents Reported:</span>
+                  <span>Reported:</span>
                   <span className="font-medium">{person._count.incidentsReported}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Incidents Assigned:</span>
+                  <span>Assigned:</span>
                   <span className="font-medium">{person._count.incidentsAssigned}</span>
                 </div>
-                <div className="text-xs text-slate-400 pt-2 border-t">
+                <div className="text-xs text-slate-400 pt-1 border-t">
                   Added: {new Date(person.createdAt).toLocaleDateString()}
                 </div>
               </div>
-              
-              <div className="flex items-center justify-end space-x-2 mt-4 pt-4 border-t">
+
+              <div className="flex items-center justify-end space-x-1 md:space-x-2 mt-3 md:mt-4 pt-3 md:pt-4 border-t">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleEdit(person)}
+                  className="text-xs px-2 md:px-3 h-8"
                 >
                   <Edit className="h-3 w-3 mr-1" />
-                  Edit
+                  <span className="hidden sm:inline">Edit</span>
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleDelete(person.id)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 text-xs px-2 md:px-3 h-8"
                 >
                   <Trash2 className="h-3 w-3 mr-1" />
-                  Delete
+                  <span className="hidden sm:inline">Delete</span>
                 </Button>
               </div>
             </CardContent>
@@ -351,14 +357,14 @@ function PersonnelFormModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-3 md:p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">
+        <div className="p-4 md:p-6">
+          <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">
             {personnel ? 'Edit Personnel' : 'Add New Personnel'}
           </h3>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
+
+          <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Full Name *
@@ -367,9 +373,10 @@ function PersonnelFormModal({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
+                className="text-sm"
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Email Address *
@@ -379,15 +386,16 @@ function PersonnelFormModal({
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
+                className="text-sm"
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Role *
               </label>
               <Select value={formData.role} onValueChange={(value: any) => setFormData({ ...formData, role: value })}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9 md:h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -397,20 +405,21 @@ function PersonnelFormModal({
                 </SelectContent>
               </Select>
             </div>
-            
-            <div className="flex items-center justify-end space-x-3 pt-4">
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-3 md:pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 disabled={isLoading}
+                className="w-full sm:w-auto h-9 md:h-10 text-sm"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white"
+                className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white h-9 md:h-10 text-sm"
               >
                 {isLoading ? 'Saving...' : (personnel ? 'Update Personnel' : 'Add Personnel')}
               </Button>

@@ -64,60 +64,71 @@ export default function SettingsPage() {
   return (
     <>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center space-x-3">
-              <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
-              <div className="flex items-center space-x-2 px-3 py-1 bg-green-100 border border-green-200 rounded-full">
-                <Shield className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-700">Administrator Access</span>
+        {/* Header - Mobile Optimized */}
+        <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+          <div className="flex flex-col space-y-2 md:space-y-0">
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:space-x-3 md:space-y-0">
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Settings</h1>
+              <div className="flex items-center space-x-2 px-2 py-1 md:px-3 bg-green-100 border border-green-200 rounded-full w-fit">
+                <Shield className="h-3 w-3 md:h-4 md:w-4 text-green-600" />
+                <span className="text-xs md:text-sm font-medium text-green-700">Admin Access</span>
               </div>
             </div>
-            <p className="text-slate-600 mt-1">
+            <p className="text-sm md:text-base text-slate-600">
               Manage your fleet vehicles and personnel (Protected Access)
             </p>
           </div>
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLogout}
-              className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-            >
-              <Lock className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
-            <SettingsIcon className="h-8 w-8 text-slate-400" />
+          <div className="flex items-center justify-between md:justify-end md:space-x-3">
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 text-xs md:text-sm"
+              >
+                <Lock className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
+                <span className="md:inline">Logout</span>
+              </Button>
+              <SettingsIcon className="h-6 w-6 md:h-8 md:w-8 text-slate-400" />
+            </div>
           </div>
         </div>
 
-        {/* Security Notice */}
+        {/* Security Notice - Mobile Optimized */}
         <Card className="border-amber-200 bg-amber-50">
-          <CardContent className="pt-6">
-            <div className="flex items-start space-x-3">
-              <Lock className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <CardContent className="p-3 md:p-6 md:pt-6">
+            <div className="flex items-start space-x-2 md:space-x-3">
+              <Lock className="h-4 w-4 md:h-5 md:w-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-medium text-amber-800">Administrator Access Required</h3>
-                <p className="text-sm text-amber-700 mt-1">
-                  You are currently accessing settings with administrator privileges. 
-                  All changes made here will affect the entire system. Please proceed with caution.
+                <h3 className="text-sm md:text-base font-medium text-amber-800">Administrator Access Required</h3>
+                <p className="text-xs md:text-sm text-amber-700 mt-1">
+                  You are accessing settings with administrator privileges.
+                  <span className="hidden md:inline"> All changes made here will affect the entire system. Please proceed with caution.</span>
+                  <span className="md:hidden"> Changes affect entire system.</span>
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Settings Tabs */}
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2">
-            <TabsTrigger value="vehicles" className="flex items-center space-x-2 transition-all duration-150">
-              <Car className="h-4 w-4" />
-              <span>Vehicles</span>
+        {/* Settings Tabs - Mobile Optimized */}
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 md:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 h-auto p-1 md:p-2">
+            <TabsTrigger
+              value="vehicles"
+              className="flex items-center justify-center space-x-1 md:space-x-2 transition-all duration-150 py-2 md:py-3 text-xs md:text-sm"
+            >
+              <Car className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Vehicles</span>
+              <span className="sm:hidden">Vehicles</span>
             </TabsTrigger>
-            <TabsTrigger value="personnel" className="flex items-center space-x-2 transition-all duration-150">
-              <Users className="h-4 w-4" />
-              <span>Personnel</span>
+            <TabsTrigger
+              value="personnel"
+              className="flex items-center justify-center space-x-1 md:space-x-2 transition-all duration-150 py-2 md:py-3 text-xs md:text-sm"
+            >
+              <Users className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Personnel</span>
+              <span className="sm:hidden">Personnel</span>
             </TabsTrigger>
           </TabsList>
 

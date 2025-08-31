@@ -170,26 +170,40 @@ export function CarsManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Header with search and filters */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Car className="h-5 w-5 text-slate-600" />
-          <h3 className="text-lg font-semibold">Fleet Vehicles ({filteredCars.length})</h3>
+      {/* Header with search and filters - Mobile Optimized */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Car className="h-4 w-4 md:h-5 md:w-5 text-slate-600" />
+            <h3 className="text-base md:text-lg font-semibold">Fleet Vehicles ({filteredCars.length})</h3>
+          </div>
+
+          <Button
+            onClick={() => {
+              setEditingCar(null)
+              setIsModalOpen(true)
+            }}
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white w-full sm:w-auto"
+            size="sm"
+          >
+            <Plus className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
+            <span className="text-xs md:text-sm">Add Vehicle</span>
+          </Button>
         </div>
-        
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+
+        <div className="flex flex-col sm:flex-row gap-2 w-full">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 md:h-4 md:w-4 text-slate-400" />
             <Input
               placeholder="Search vehicles..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full sm:w-64"
+              className="pl-9 md:pl-10 w-full text-sm"
             />
           </div>
-          
+
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-32">
+            <SelectTrigger className="w-full sm:w-32 h-9 md:h-10">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -200,63 +214,53 @@ export function CarsManagement() {
               <SelectItem value="RETIRED">Retired</SelectItem>
             </SelectContent>
           </Select>
-          
-          <Button
-            onClick={() => {
-              setEditingCar(null)
-              setIsModalOpen(true)
-            }}
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Vehicle
-          </Button>
         </div>
       </div>
 
-      {/* Cars Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Cars Grid - Mobile Optimized */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
         {filteredCars.map((car: Car) => (
           <Card key={car.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 md:pb-3">
               <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-lg">{car.make} {car.model}</CardTitle>
-                  <CardDescription className="text-sm">
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-base md:text-lg truncate">{car.make} {car.model}</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
                     {car.year} • {car.licensePlate}
                   </CardDescription>
                 </div>
-                <Badge className={getStatusColor(car.status)}>
+                <Badge className={`${getStatusColor(car.status)} text-xs ml-2 flex-shrink-0`}>
                   {car.status}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="space-y-2 text-sm text-slate-600">
+              <div className="space-y-1 md:space-y-2 text-xs md:text-sm text-slate-600">
                 {car.color && <div>Color: {car.color}</div>}
-                {car.vin && <div>VIN: {car.vin}</div>}
-                <div className="text-xs text-slate-400">
+                {car.vin && <div className="truncate">VIN: {car.vin}</div>}
+                <div className="text-xs text-slate-400 pt-1">
                   Added: {new Date(car.createdAt).toLocaleDateString()}
                 </div>
               </div>
-              
-              <div className="flex items-center justify-end space-x-2 mt-4 pt-4 border-t">
+
+              <div className="flex items-center justify-end space-x-1 md:space-x-2 mt-3 md:mt-4 pt-3 md:pt-4 border-t">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleEdit(car)}
+                  className="text-xs px-2 md:px-3 h-8"
                 >
                   <Edit className="h-3 w-3 mr-1" />
-                  Edit
+                  <span className="hidden sm:inline">Edit</span>
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleDelete(car.id)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 text-xs px-2 md:px-3 h-8"
                 >
                   <Trash2 className="h-3 w-3 mr-1" />
-                  Delete
+                  <span className="hidden sm:inline">Delete</span>
                 </Button>
               </div>
             </CardContent>
@@ -333,15 +337,15 @@ function CarFormModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-3 md:p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">
+        <div className="p-4 md:p-6">
+          <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">
             {car ? 'Edit Vehicle' : 'Add New Vehicle'}
           </h3>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+
+          <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   Make *
@@ -350,6 +354,7 @@ function CarFormModal({
                   value={formData.make}
                   onChange={(e) => setFormData({ ...formData, make: e.target.value })}
                   required
+                  className="text-sm"
                 />
               </div>
               <div>
@@ -360,11 +365,12 @@ function CarFormModal({
                   value={formData.model}
                   onChange={(e) => setFormData({ ...formData, model: e.target.value })}
                   required
+                  className="text-sm"
                 />
               </div>
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   Year *
@@ -376,6 +382,7 @@ function CarFormModal({
                   min="1900"
                   max={new Date().getFullYear() + 1}
                   required
+                  className="text-sm"
                 />
               </div>
               <div>
@@ -385,10 +392,11 @@ function CarFormModal({
                 <Input
                   value={formData.color}
                   onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                  className="text-sm"
                 />
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 License Plate *
@@ -397,9 +405,10 @@ function CarFormModal({
                 value={formData.licensePlate}
                 onChange={(e) => setFormData({ ...formData, licensePlate: e.target.value.toUpperCase() })}
                 required
+                className="text-sm"
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 VIN
@@ -408,15 +417,16 @@ function CarFormModal({
                 value={formData.vin}
                 onChange={(e) => setFormData({ ...formData, vin: e.target.value.toUpperCase() })}
                 placeholder="Vehicle Identification Number"
+                className="text-sm"
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Status
               </label>
               <Select value={formData.status} onValueChange={(value: any) => setFormData({ ...formData, status: value })}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9 md:h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -427,20 +437,21 @@ function CarFormModal({
                 </SelectContent>
               </Select>
             </div>
-            
-            <div className="flex items-center justify-end space-x-3 pt-4">
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-3 md:pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 disabled={isLoading}
+                className="w-full sm:w-auto h-9 md:h-10 text-sm"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white"
+                className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white h-9 md:h-10 text-sm"
               >
                 {isLoading ? 'Saving...' : (car ? 'Update Vehicle' : 'Add Vehicle')}
               </Button>
