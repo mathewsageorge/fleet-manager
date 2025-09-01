@@ -1,13 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-// GET /api/cars - Get all cars
-export async function GET() {
+// GET /api/cars - Get all cars with optional filtering
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const activeOnly = searchParams.get('activeOnly') === 'true'
+    const search = searchParams.get('search')?.toLowerCase()
+
+    let whereClause: any = {}
+
+    // Filter for active vehicles only when requested
+    if (activeOnly) {
+      whereClause.status = 'ACTIVE'
+    }
+
+    // Search functionality for license plate and vehicle name
+    if (search) {
+      whereClause.OR = [
+        {
+          licensePlate: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+        {
+          make: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+        {
+          model: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        }
+      ]
+    }
+
     const cars = await prisma.car.findMany({
-      orderBy: { createdAt: 'desc' },
+      where: whereClause,
+      orderBy: [
+        { licensePlate: 'asc' }, // Sort by license plate first
+        { createdAt: 'desc' }
+      ],
     })
-    
+
     return NextResponse.json(cars)
   } catch (error) {
     console.error('Error fetching cars:', error)

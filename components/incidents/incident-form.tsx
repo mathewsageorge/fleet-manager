@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useCreateIncident, useCars, useUsers } from '@/lib/queries/incidents'
+import { useCreateIncident, useUsers } from '@/lib/queries/incidents'
 import { notifications } from '@/lib/notifications'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertCircle, Car, User, Calendar, MapPin, Camera } from 'lucide-react'
 import { ImageUpload } from '@/components/ui/image-upload'
 import { LocationPicker } from '@/components/ui/location-picker'
+import { SearchableVehicleSelect } from '@/components/ui/searchable-vehicle-select'
 
 interface IncidentFormProps {
   initialData?: any
@@ -20,12 +21,7 @@ interface IncidentFormProps {
   isSubmitting?: boolean
 }
 
-interface Car {
-  id: number
-  make: string
-  model: string
-  licensePlate: string
-}
+
 
 interface User {
   id: number
@@ -35,7 +31,6 @@ interface User {
 
 export function IncidentForm({ initialData, isEditing = false, onSubmit, isSubmitting = false }: IncidentFormProps) {
   const router = useRouter()
-  const { data: cars } = useCars()
   const { data: users } = useUsers()
   const createMutation = useCreateIncident()
 
@@ -43,7 +38,6 @@ export function IncidentForm({ initialData, isEditing = false, onSubmit, isSubmi
   const [createStatus, setCreateStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [createMessage, setCreateMessage] = React.useState('')
 
-  const typedCars = cars as Car[]
   const typedUsers = users as User[]
 
   const [formData, setFormData] = useState({
@@ -226,19 +220,16 @@ export function IncidentForm({ initialData, isEditing = false, onSubmit, isSubmi
         <CardContent className="space-y-4">
           <div>
             <label className="text-sm font-medium">Vehicle *</label>
-            <Select value={formData.carId} onValueChange={(value) => handleChange('carId', value)}>
-              <SelectTrigger className={errors.carId ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Select a vehicle" />
-              </SelectTrigger>
-              <SelectContent>
-                {typedCars && typedCars.map((car: Car) => (
-                  <SelectItem key={car.id} value={car.id.toString()}>
-                    {car.make} {car.model} ({car.licensePlate})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableVehicleSelect
+              value={formData.carId}
+              onChange={(value) => handleChange('carId', value)}
+              placeholder="Search and select an active vehicle..."
+              className={errors.carId ? 'border-red-500' : ''}
+            />
             {errors.carId && <p className="text-sm text-red-500 mt-1">{errors.carId}</p>}
+            <p className="text-xs text-muted-foreground mt-1">
+              🔍 Only active vehicles are shown. Search by license plate or vehicle name.
+            </p>
           </div>
 
           <div>

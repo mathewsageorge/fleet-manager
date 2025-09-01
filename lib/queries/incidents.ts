@@ -69,8 +69,13 @@ export const fetchIncidentStats = async () => {
   return apiClient.get<IncidentStats>('/incidents/stats')
 }
 
-export const fetchCars = async () => {
-  return apiClient.get('/cars')
+export const fetchCars = async (activeOnly?: boolean, search?: string) => {
+  const params = new URLSearchParams()
+  if (activeOnly) params.append('activeOnly', 'true')
+  if (search) params.append('search', search)
+
+  const endpoint = params.toString() ? `/cars?${params}` : '/cars'
+  return apiClient.get(endpoint)
 }
 
 export const fetchUsers = async () => {
@@ -107,8 +112,16 @@ export const useIncidentStats = () => {
 export const useCars = () => {
   return useQuery({
     queryKey: queryKeys.cars.list(),
-    queryFn: fetchCars,
+    queryFn: () => fetchCars(),
     staleTime: 10 * 60 * 1000, // 10 minutes
+  })
+}
+
+export const useActiveCars = (search?: string) => {
+  return useQuery({
+    queryKey: queryKeys.cars.list({ activeOnly: true, search }),
+    queryFn: () => fetchCars(true, search),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
 
